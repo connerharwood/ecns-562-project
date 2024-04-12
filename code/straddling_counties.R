@@ -6,10 +6,11 @@ library(tmap)
 # ---- load data
 
 # load Wisconsin counties shapefile
-all_counties = st_read("~/OneDrive - Montana State University/Metrics Project/wisconsin/data/counties shapefile/Wisconsin.shp")
+all_counties = st_read("~/562-Project/raw-data/counties-shapefile/wisconsin_counties.shp")
 
+# load Wisconsin cities shapefile
 # load Great Lakes Basin shapefile
-basin = st_read("~/OneDrive - Montana State University/Metrics Project/wisconsin/data/basin shapefile/subbasins.shp")
+basin = st_read("~/562-Project/raw-data/basin-shapefile/subbasins.shp")
 
 # make valid
 all_counties = st_make_valid(all_counties)
@@ -23,15 +24,15 @@ basin = st_transform(basin, crs = 4326)
 # ---- find straddling counties
 
 # select Lake Superior and Lake Michigan subbasins (Wisconsin only lies in these subbasins)
-basins = basin |> 
+subbasins = basin |> 
   rename(subbasin = merge) |> 
   filter(subbasin == "lk_sup" | subbasin == "lk_mich")
 
 # counties lying at least partially within Great Lakes Basin (straddling counties)
-basin_counties = st_intersection(all_counties, basins)
+basin_counties = st_intersection(all_counties, subbasins)
 
 # counties lying fully within Great Lakes Basin
-fully_within_counties = all_counties[st_within(all_counties, basins, sparse = FALSE), ]
+fully_within_counties = all_counties[st_within(all_counties, subbasins, sparse = FALSE), ]
 
 # filter out counties lying fully with basin to include only straddling counties
 straddling_counties_partial = basin_counties |> 
@@ -62,6 +63,7 @@ straddling_counties = straddling_counties_full |>
   arrange(COUNTY_NAM) |> 
   # calculate percent of each county lying within Great Lakes Basin
   mutate(percent_within = straddling_counties_partial2$area / area) |> 
+  # select and rename relevant variables
   select(
     county = COUNTY_NAM,
     percent_within,
@@ -75,6 +77,8 @@ straddling_counties = straddling_counties_full |>
   )
 
 #------------------------------------------------------------------------------#
+# ---- number of cities contained in each straddling county
+
 
 st_write(
   straddling_counties, 
