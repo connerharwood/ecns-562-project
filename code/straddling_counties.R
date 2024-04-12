@@ -3,26 +3,29 @@ library(sf)
 library(tmap)
 
 #------------------------------------------------------------------------------#
-# ---- load data
+# load data ----
 
 # load Wisconsin counties shapefile
 all_counties = st_read("~/562-Project/raw-data/counties-shapefile/wisconsin_counties.shp")
 
 # load Wisconsin cities shapefile
-all_cities = st_read()
+all_cities = st_read("~/562-Project/raw-data/cities-shapefile/wisconsin_cities.shp")
+
 # load Great Lakes Basin shapefile
 basin = st_read("~/562-Project/raw-data/basin-shapefile/subbasins.shp")
 
 # make valid
 all_counties = st_make_valid(all_counties)
+all_cities = st_make_valid(all_cities)
 basin = st_make_valid(basin)
 
 # transform CRS of shapefiles to WGS 84
 all_counties = st_transform(all_counties, crs = 4326)
+all_cities = st_transform(all_cities, crs = 4326)
 basin = st_transform(basin, crs = 4326)
 
 #------------------------------------------------------------------------------#
-# ---- find straddling counties
+# find straddling counties ----
 
 # select Lake Superior and Lake Michigan subbasins (Wisconsin only lies in these subbasins)
 subbasins = basin |> 
@@ -40,7 +43,7 @@ straddling_counties_partial = basin_counties |>
   filter(!COUNTY_NAM %in% fully_within_counties$COUNTY_NAM)
 
 #------------------------------------------------------------------------------#
-# ---- percent of each county lying within basin
+# percent of each county lying within basin ----
 
 # full polygons of straddling counties
 straddling_counties_full = all_counties |> 
@@ -78,8 +81,35 @@ straddling_counties = straddling_counties_full |>
   )
 
 #------------------------------------------------------------------------------#
-# ---- number of cities contained in each straddling county
+# number of cities contained in each straddling county ----
 
+# filter cities data to only include straddling counties
+straddling_cities = all_cities |>
+  # add "County" to each county
+  mutate(CNTY_NAME = paste(CNTY_NAME, "County")) |> 
+  filter(CNTY_NAME %in% straddling_counties$county)
+
+# calculate number of cities in each straddling county
+cities_per_county = straddling_cities |> 
+  select(
+    county = CNTY_NAME,
+    city = MCD_NAME
+  ) |> 
+  # convert city names to title case
+  mutate(city = str_to_title(city)) |> 
+  distinct(county, city) |> 
+  group_by(county) |> 
+  summarize(n_cities = n())
+
+# merge with straddling counties sf object
+straddling_counties = left_join(straddling_counties, cities_per_county, by = "county")
+
+#------------------------------------------------------------------------------#
+# distance to nearest Great Lake ----
+
+
+
+#------------------------------------------------------------------------------#
 
 st_write(
   straddling_counties, 
