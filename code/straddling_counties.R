@@ -120,8 +120,9 @@ straddling_counties = straddling_counties |>
   filter(!(county == "Vilas County" & subbasin == "lk_mich"))
 
 #------------------------------------------------------------------------------#
+
 st_write(
   straddling_counties, 
-  "~/OneDrive - Montana State University/Metrics Project/wisconsin/data/straddling counties shapefile/straddling_counties.shp",
+  "~/562-Project/clean-data/straddling-counties/straddling_counties.shp",
   append = FALSE
 )
