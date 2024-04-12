@@ -9,6 +9,7 @@ library(tmap)
 all_counties = st_read("~/562-Project/raw-data/counties-shapefile/wisconsin_counties.shp")
 
 # load Wisconsin cities shapefile
+all_cities = st_read()
 # load Great Lakes Basin shapefile
 basin = st_read("~/562-Project/raw-data/basin-shapefile/subbasins.shp")
 
