@@ -114,7 +114,7 @@ series_names = c(
   # annual resident population
   "WIADAM1POP" = "adams_pop", 
   # annual median household income
-  "MHIWI55001A052NCEN" = "adams_income", 
+  "MHIWI55001A052NCEN" = "adams_income",
   # annual unemployment rate
   "LAUCN550010000000003A" = "adams_unemp", 
   # quarterly number of private establishments for all industries
@@ -274,7 +274,7 @@ series_names = c(
   "MHIWI55137A052NCEN" = "waushara_income", 
   "LAUCN551370000000003A" = "waushara_unemp", 
   "ENU5513720510" = "waushara_establishments", 
-  "BPPRIV055137" = "waushara_housing",
+  "BPPRIV055137" = "waushara_housing"
 )
 
 # filter data for each series into separate lists
@@ -291,26 +291,8 @@ list2env(filtered_data, envir = .GlobalEnv)
 
 #------------------------------------------------------------------------------#
 
-# save as .rds file
-save(
-  adams_pop, adams_income, adams_unemp, adams_establishments, adams_housing, 
-  file = "~/562-Project/raw-data/fred/adams.rds"
-)
+# remove unwanted objects in environment to save all FRED data quickly as one .rda file
+rm(all_series_data, data, filtered_data, series_data, endpoint, series, series_id, series_names, url, get_series_data)
 
-# save as .rda file
-save(
-  ashland_pop, ashland_income, ashland_unemp, ashland_establishments, ashland_housing, 
-  file = "~/562-Project/raw-data/fred/ashland.rds"
-)
-
-# save as .rda file
-save(
-  bayfield_pop, bayfield_income, bayfield_unemp, bayfield_establishments, bayfield_housing, 
-  file = "~/562-Project/raw-data/fred/bayfield.rds"
-)
-
-# save as .rda file
-save(
-  columbia_pop, columbia_income, columbia_unemp, columbia_establishments, columbia_housing, 
-  file = "~/562-Project/raw-data/fred/bayfield.rds"
-)
+# save all data as one .rda file
+save.image("~/562-Project/raw-data/fred/fred_raw.rda")
