@@ -1,8 +1,8 @@
-library(httr)
+library(tidyverse)
 library(jsonlite)
 
 # run this code in console with FRED API key
-#Sys.setenv(fred_api_key = "xxxxxxxxxxxxxxxxxxx")
+# Sys.setenv(fred_api_key = "xxxxxxxxxxxxxxxxxxx")
 
 # set FRED API url and endpoint
 url = "https://api.stlouisfed.org/"

@@ -6,7 +6,7 @@ library(sf)
 # load shapefiles
 all_counties = st_read("~/562-Project/raw-data/counties-shapefile/wisconsin_counties.shp")
 all_cities = st_read("~/562-Project/raw-data/cities-shapefile/wisconsin_cities.shp")
-basin = st_read("~/562-Project/raw-data/basin-shapefile/subbasins.shp")
+basin = st_read("~/562-Project/raw-data/great-lakes-shapefiles/subbasins/subbasins.shp")
 
 # make valid and transform CRS to WGS 84
 all_counties = all_counties |> st_make_valid() |> st_transform(crs = 4326)
