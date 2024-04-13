@@ -260,4 +260,14 @@ fred_na = fred_merge4 |>
   summarize_all(~ all(!is.na(.))) |> 
   filter_all(all_vars(.))
 
-fred_clean
+# restrict data to 1997-2022 for most complete data
+fred1997_2022 = fred_merge4 |> 
+  filter(year <= 2022 & year >= 1997)
+
+# check that all counties appear in all years
+checkyears = fred1997_2022 |> 
+  group_by(year) |> 
+  summarize(n_counties = n_distinct(county))
+
+# save
+saveRDS(fred1997_2022, file = "~/562-Project/clean-data/fred.rds")
