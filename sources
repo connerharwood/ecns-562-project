@@ -10,5 +10,11 @@ https://data-wi-dnr.opendata.arcgis.com/datasets/wi-dnr::county-boundaries-24k/a
 Cities shapefile:
 https://gis-ltsb.hub.arcgis.com/pages/download-data
 
-Wisconsin wells inventory:
+Wells inventory:
 https://apps.dnr.wi.gov/grnext/WellInventory/Search
+
+Well abandonment records:
+https://apps.dnr.wi.gov/warspub/Submit/ReportList/CompletedReportList
+
+Withdrawal sources:
+https://apps.dnr.wi.gov/waterusepub/Source
