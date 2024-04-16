@@ -44,10 +44,22 @@ wq1 = wq_raw |>
   filter(!is.na(sample_result) & !is.na(unit) &!is.na(param))
 
 # parameters with samples in all years for all counties
-year_counts = wq1 |> 
+complete_params = wq1 |> 
+  group_by(county, param, param_code) |> 
+  summarize(n_years = n_distinct(year)) |> 
+  filter(n_years >= 25)
+
+complete_params2 = complete_params |> 
   group_by(param, param_code) |> 
+  summarize(n_counties = n_distinct(county))
+
+# parameters with samples in all years for all counties
+complete_params = wq1 |> 
+  group_by(county, param, param_code) |> 
   summarize(n = n_distinct(year)) |> 
-  filter(n == 26)
+  ungroup() |> 
+  group_by(param, param_code) |> 
+  summarize(n_counties = n_distinct(county))
 
 # filter to include only potentially relevant parameters
 wq2 = wq1 |> 
@@ -139,4 +151,51 @@ units = wq4 |>
 # most relevant parameters for Wisconsin: coliform (bacteria), nitrate (NO3), arsenic, copper, lead, radium
 wq5 = wq4 |> 
   filter(param_code %in% c("99060", "620", "1002", "1042", "1051", "11503"))
+
+# units again
+units = wq5 |> 
+  group_by(param, param_code, unit) |> 
+  summarize(unit_count = n()) |> 
+  arrange(param)
+
+# number of samples for each parameter per year and county
+obs = wq5 |> 
+  group_by(year, county, param, param_code) |> 
+  summarize(n = n())
+
+# there are at least 30 samples of
 #------------------------------------------------------------------------------#
+# averages ----
+
+# calculate year-county averages for coliform detection
+coliform = wq5 |> 
+  filter(param_code == "99060") |> 
+  group_by(year, county) |> 
+  summarize(mean_result = mean(sample_result == 1)) |> 
+  mutate(param = "Coliform total Colilert absent/present", param_code = "99060")
+
+# calculate year-county averages for non-coliform parameters
+others = wq5 |> 
+  filter(param_code != "99060") |> 
+  group_by(year, county, param, param_code) |> 
+  summarize(mean_result = mean(sample_result))
+
+# combine averages into one dataset
+wq_averages = rbind(others, coliform) |> mutate(mean_result = as.numeric(round(mean_result, digits = 6)))
+
+# amount of rows with only 1 observation
+# 99060: 53 coliform
+# 620: 18 nitrate
+# 1002: 42 arsenic
+# 1042: 107 copper
+# 1051: 112 lead
+# 11503: 52 radium
+
+radium = wq_averages |> 
+  filter(param_code == 11503) |> 
+  group_by(year) |> 
+  summarize(n = n_distinct(county))
+coliform = wq_averages |> 
+  filter(param_code == 99060) |> 
+  group_by(year) |> 
+  summarize(n = n_distinct(county))
