@@ -32,6 +32,8 @@ masterdata_raw = merge2 |>
       county == "Racine County" & year == 2018 ~ 1,
       # Village of Somers diversion
       county == "Kenosha County" & year == 2021 ~ 1,
+      # Village of Pleasant Prairie
+      county == "Kenosha County" & year== 2010 ~ 1,
       
       TRUE ~ 0
     ),

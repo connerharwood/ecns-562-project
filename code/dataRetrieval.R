@@ -21,6 +21,7 @@ straddling_sites = st_intersection(wi_sites_sf, counties_sf)
 straddling_sites = straddling_sites |> 
   distinct(MonitoringLocationIdentifier) |> 
   pull(MonitoringLocationIdentifier)
+
 #------------------------------------------------------------------------------#
 
 wq_raw = readWQPdata(
@@ -28,4 +29,75 @@ wq_raw = readWQPdata(
   startDateLo = "1997-01-01",
   startDateHi = "2022-12-31",
   characteristicName = c("Coliforms")
+)
+
+radium_raw = readWQPdata(
+  
+)
+
+data_list = list()
+
+for (site in straddling_sites) {
+  data = readWQPdata(site, )
+}
+
+radium_test = readWQPdata(
+  siteid = "USGS-04072657",
+  characteristicName = "radium",
+  "startDateLo" = "1997-01-01",
+  "startDateHi" = "2022-12-31"
+)
+
+#------------------------------------------------------------------------------#
+# Seunghyun method ----
+
+pacman::p_load(
+  dataRetrieval,
+  tidyverse,
+  data.table,
+  furrr,
+  tigris
+)
+
+wi = counties(state = "WI")
+
+straddling_counties = wi |> 
+  filter(NAMELSAD %in% counties_sf$county)
+
+closeAllConnections()
+plan("multisession", workers = 30)
+
+df_wi_radium <- future_map(
+  .progress = T,
+  straddling_counties$NAME, function(nme) {
+    library(dataRetrieval)
+    library(data.table)
+    
+    tryCatch(
+      readWQPdata(
+        statecode = "WI",
+        countycode = nme,
+        startDateLo = "1997-01-01",
+        parameterCd = "09501"
+      ),
+      error = function(e) {
+        NULL
+      }
+    )
+  }
+) %>% rbindlist()
+
+
+
+
+for(site in straddling_sites) {
+  data = readWQPdata(siteid = site, characteristicType = "Radiochemical", startDateLo = "1997-01-01", startDateHi = "2022-12-31")
+  data_list[[site]] <- data
+}
+
+adams_radium = readWQPdata(
+  statecode = "WI",
+  countycode = "Waukesha",
+  parameterCd = 09501,
+  startDateLo = "1997-01-01"
 )
