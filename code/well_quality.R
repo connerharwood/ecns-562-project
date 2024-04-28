@@ -1,13 +1,43 @@
 library(tidyverse)
-library(readxl)
 
-# wells and well water quality data
-well_quality_raw1 = read_xlsx("~/562-Project/raw-data/wells/well_quality1.xlsx")
-well_quality_raw2 = read_xlsx("~/562-Project/raw-data/wells/well_quality2.xlsx")
-well_quality_raw = rbind(well_quality_raw1, well_quality_raw2)
+# Wisconsin drinking water quality data
+radium_raw = read_csv("~/562-Project/raw-data/water-quality/radium.csv")
+
+wq_raw_raw = rbind(radium_raw, )
 
 #------------------------------------------------------------------------------#
 # cleaning ----
+
+radium = radium_raw |> 
+  select(
+    county = County,
+    year = `Sample Date`,
+    contaminant = Contaminant,
+    measurement = `Measured Amount`,
+    units = Units,
+    id = `Sample ID`,
+    storet_code = `Storet Code`
+  ) |> 
+  mutate(
+    county = paste(county, "County"),
+    year = as.numeric(substr(year, 7, 10))
+  )
+  
+yearcounty_ave = radium |> 
+  group_by(county, year) |> 
+  summarize(average = mean(measurement))
+  
+radium_226_228 = radium |> 
+  
+  
+  
+  
+  
+check = radium |> 
+  group_by(year, id) |> 
+  summarize(count = n_distinct(contaminant))
+  
+
 
 well_quality1 = well_quality_raw |> 
   # select and rename relevant variables
