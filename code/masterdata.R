@@ -1,11 +1,13 @@
 library(tidyverse)
 library(sf)
-library(tmap)
 
+# load individual datasets
 straddling_counties = st_read("~/562-Project/clean-data/straddling-counties/straddling_counties.shp")
 fred1997_2022 = readRDS("~/562-Project/clean-data/fred.rds")
 withdrawal_sources = readRDS("~/562-Project/clean-data/withdrawal_sources.rds")
 radium = readRDS("~/562-Project/clean-data/radium.rds")
+
+#------------------------------------------------------------------------------#
 
 straddling_counties = straddling_counties |> 
   # rename shortened column names
@@ -22,7 +24,7 @@ merge1 = left_join(fred1997_2022, straddling_counties, by = "county", relationsh
 merge2 = left_join(merge1, withdrawal_sources, by = c("county", "year"), relationship = "one-to-one")
 merge3 = left_join(merge2, radium, by = c("county", "year"), relationship = "one-to-one")
 
-masterdata_raw = merge2 |> 
+masterdata_raw = merge3 |> 
   mutate(
     # binary variable indicating when a county submitted a diversion proposal
     approval = case_when(
@@ -35,34 +37,34 @@ masterdata_raw = merge2 |>
       # Village of Somers diversion
       county == "Kenosha County" & year == 2021 ~ 1,
       # Village of Pleasant Prairie
-      county == "Kenosha County" & year== 2010 ~ 1,
+      county == "Kenosha County" & year == 2010 ~ 1,
       
       TRUE ~ 0
     ),
+    # remove unit from area entries
     area = as.numeric(str_replace(area, "\\s*\\[mi\\^2\\]", "")),
+    # calculate number of public drinking water sources per square mile
     sources_per_mi2 = sources / area
   )
 
-# other diversions (with POSSIBLE proposal dates):
-# Menominee Falls: 2005
-# City of Kenosha: 2007
+masterdata = masterdata_raw |> 
+  select(
+    county,
+    year,
+    population,
+    income,
+    u_rate,
+    housing_permits = permits,
+    private_establishments = establishments,
+    percent_within,
+    cities_outside = n_cities_outside,
+    sources_mi2 = sources_per_mi2,
+    radium_ave = ra_average,
+    approval,
+    geometry
+  )
 
-firth = logistf(
-  approval ~ population + income + u_rate + permits + establishments + percent_within + n_cities_outside + sources_per_mi2,
-  data = masterdata_raw,
-  control = logistf.control(maxit = 1000),
-  flic = TRUE
-)
-summary(firth)
+#------------------------------------------------------------------------------#
 
-lk_mi_data = masterdata_raw |> 
-  filter(subbasin != "lk_sup") |> 
-  filter(year > 2000)
-
-firth2 = logistf(
-  approval ~ population + income + u_rate + percent_within + n_cities_outside + sources_per_mi2,
-  data = lk_mi_data,
-  control = logistf.control(maxit = 1000),
-  flic = TRUE
-)
-summary(firth2)
+# save masterdata
+saveRDS(masterdata, file = "~/562-Project/clean-data/masterdata.rds")
