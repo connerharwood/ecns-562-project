@@ -1,6 +1,10 @@
 library(tidyverse)
 library(logistf)
 
+masterdata = readRDS("~/562-Project/clean-data/masterdata.rds")
+
+#------------------------------------------------------------------------------#
+
 firth = logistf(
   approval ~ population + income + u_rate + permits + establishments + percent_within + n_cities_outside + sources_per_mi2,
   data = masterdata_raw,

@@ -53,13 +53,13 @@ masterdata = masterdata_raw |>
     year,
     population,
     income,
-    u_rate,
-    housing_permits = permits,
-    private_establishments = establishments,
+    unemp = u_rate,
+    permits,
+    establishments,
     percent_within,
     cities_outside = n_cities_outside,
-    sources_mi2 = sources_per_mi2,
-    radium_ave = ra_average,
+    sources = sources_per_mi2,
+    radium = ra_average,
     approval,
     geometry
   )
