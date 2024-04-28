@@ -82,7 +82,7 @@ impute = grid |>
   left_join(county_minimum, by = c("county")) |> 
   mutate(ra_average = ifelse(is.na(ra_average), ra_minimum, ra_average))
 
-radium = impute
+radium = impute |> select(-ra_minimum)
 
 #------------------------------------------------------------------------------#
 

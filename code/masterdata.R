@@ -5,6 +5,7 @@ library(tmap)
 straddling_counties = st_read("~/562-Project/clean-data/straddling-counties/straddling_counties.shp")
 fred1997_2022 = readRDS("~/562-Project/clean-data/fred.rds")
 withdrawal_sources = readRDS("~/562-Project/clean-data/withdrawal_sources.rds")
+radium = readRDS("~/562-Project/clean-data/radium.rds")
 
 straddling_counties = straddling_counties |> 
   # rename shortened column names
@@ -19,6 +20,7 @@ straddling_counties = straddling_counties |>
 # merge
 merge1 = left_join(fred1997_2022, straddling_counties, by = "county", relationship = "many-to-one")
 merge2 = left_join(merge1, withdrawal_sources, by = c("county", "year"), relationship = "one-to-one")
+merge3 = left_join(merge2, radium, by = c("county", "year"), relationship = "one-to-one")
 
 masterdata_raw = merge2 |> 
   mutate(
