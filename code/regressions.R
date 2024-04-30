@@ -4,19 +4,80 @@ library(logistf)
 masterdata = readRDS("~/562-Project/clean-data/masterdata.rds")
 
 #------------------------------------------------------------------------------#
+# functional form ----
+
+# histograms of explanatory variables
+ggplot(masterdata, aes(x = population)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(population))) +
+  geom_histogram(bins = 90) # don't transform
+
+ggplot(masterdata, aes(x = permits)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(permits))) +
+  geom_histogram(bins = 90) # transform
+
+ggplot(masterdata, aes(x = establishments)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(establishments))) +
+  geom_histogram(bins = 90) # don't transform
+
+ggplot(masterdata, aes(x = percent_within)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(percent_within))) +
+  geom_histogram(bins = 90) # don't transform
+
+ggplot(masterdata, aes(x = cities_outside)) +
+  geom_histogram(bins = 70)
+ggplot(masterdata, aes(x = log(cities_outside))) +
+  geom_histogram(bins = 70) # don't transform
+
+ggplot(masterdata, aes(x = sources)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(sources))) +
+  geom_histogram(bins = 90) # transform
+
+ggplot(masterdata, aes(x = radium)) +
+  geom_histogram(bins = 90)
+ggplot(masterdata, aes(x = log(radium + 1))) +
+  geom_histogram(bins = 90) # transform
+
+#------------------------------------------------------------------------------#
+# regressions
 
 firth = logistf(
-  approval ~ population + permits + establishments + percent_within + sources + radium + year,
-  data = masterdata
-)
-summary(firth)
-
-firth = logistf(
-  approval ~ population + percent_within + permits + establishments + radium,
+  proposal ~ log(population) + log(permits) + percent_within + log(sources) + radium,
   data = masterdata,
-  alpha = 0.90
+  control = logistf.control(maxit = 1000)
 )
 summary(firth)
+
+firth = logistf(
+  proposal ~ establishments + percent_within + cities_outside + log(sources) + log(radium + 1),
+  data = masterdata,
+  control = logistf.control(maxit = 1000)
+)
+summary(firth)
+
+
+
+
+
+
+
+
+
+
+
+firth = logistf(
+  proposal ~ log(permits) + establishments + percent_within + cities_outside + log(sources) + log(radium + 1),
+  data = masterdata,
+  control = logistf.control(maxit = 1000)
+)
+summary(firth)
+
+
+
 
 
 firth = logistf(
