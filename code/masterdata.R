@@ -27,7 +27,7 @@ merge3 = left_join(merge2, radium, by = c("county", "year"), relationship = "one
 masterdata_raw = merge3 |> 
   mutate(
     # binary variable indicating when a county submitted a diversion proposal
-    approval = case_when(
+    proposal = case_when(
       # City of Waukesha diversion
       county == "Waukesha County" & year == 2010 ~ 1,
       # City of New Berlin diversion
@@ -60,7 +60,7 @@ masterdata = masterdata_raw |>
     cities_outside = n_cities_outside,
     sources = sources_per_mi2,
     radium = ra_average,
-    approval,
+    proposal,
     geometry
   )
 
