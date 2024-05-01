@@ -1,7 +1,5 @@
 library(tidyverse)
 library(logistf)
-library(stargazer)
-library(texreg)
 
 masterdata = readRDS("~/562-Project/clean-data/masterdata.rds")
 

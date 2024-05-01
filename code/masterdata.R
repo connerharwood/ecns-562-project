@@ -68,3 +68,25 @@ masterdata = masterdata_raw |>
 
 # save masterdata
 saveRDS(masterdata, file = "~/562-Project/clean-data/masterdata.rds")
+
+
+#------------------------------------------------------------------------------#
+# radium belt subset ----
+
+masterdata_subset = masterdata |> 
+  filter(
+    county %in% c(
+      "Kenosha County",
+      "Racine County",
+      "Waukesha County",
+      "Milwaukee County",
+      "Washington County",
+      "Dodge County",
+      "Green Lake County",
+      "Fond du Lac County",
+      "Waushara County",
+      "Shawano County"
+    )
+  )
+
+saveRDS(masterdata_subset, file = "~/562-Project/clean-data/masterdata_subset.rds")
