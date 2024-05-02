@@ -68,8 +68,8 @@ masterdata_subset3 = masterdata_subset |>
 
 # regular Firth penalized logistic regression
 firth = logistf(
-  proposal ~ population + permits + establishments + percent_within + sources + radium,
-  data = masterdata_subset2,
+  proposal ~ population + permits + establishments + percent_within + sources + radium + factor(year) + factor(county),
+  data = masterdata_subset,
   control = logistf.control(maxit = 1000)
 )
 summary(firth)
@@ -85,7 +85,7 @@ summary(flac)
 # FLIC modification of Firth
 flic = flic(
   proposal ~ population + permits + establishments + percent_within + sources + radium,
-  data = masterdata,
+  data = masterdata_subset,
   control = logistf.control(maxit = 1000)
 )
 summary(flic)
