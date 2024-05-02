@@ -15,9 +15,7 @@ straddling_counties = straddling_counties |>
     percent_within = prcnt_w,
     n_cities_outside = n_cts_t,
     subbasin = subbasn
-  ) |> 
-  # calculate area in square miles of each county
-  mutate(area = units::set_units(st_area(straddling_counties), mi^2))
+  )
 
 # merge
 merge1 = left_join(fred1997_2022, straddling_counties, by = "county", relationship = "many-to-one")
@@ -40,11 +38,7 @@ masterdata_raw = merge3 |>
       county == "Kenosha County" & year == 2010 ~ 1,
       
       TRUE ~ 0
-    ),
-    # remove unit from area entries
-    area = as.numeric(str_replace(area, "\\s*\\[mi\\^2\\]", "")),
-    # calculate number of public drinking water sources per square mile
-    sources_per_mi2 = sources / area
+    )
   )
 
 masterdata = masterdata_raw |> 
@@ -58,8 +52,8 @@ masterdata = masterdata_raw |>
     establishments,
     percent_within,
     cities_outside = n_cities_outside,
-    sources = sources_per_mi2,
-    radium = ra_average,
+    sources,
+    radium = ra_max,
     proposal,
     geometry
   )
@@ -72,21 +66,25 @@ saveRDS(masterdata, file = "~/562-Project/clean-data/masterdata.rds")
 
 #------------------------------------------------------------------------------#
 # radium belt subset ----
-
+# filter to only include counties in Wisconsin's radium belt, and only counties that are more than 1% or less than 99% in the basin 
 masterdata_subset = masterdata |> 
   filter(
     county %in% c(
       "Kenosha County",
       "Racine County",
       "Waukesha County",
-      "Milwaukee County",
       "Washington County",
-      "Dodge County",
       "Green Lake County",
       "Fond du Lac County",
-      "Waushara County",
-      "Shawano County"
+      "Waushara County"
     )
-  )
+  ) |> 
+  mutate(
+    population = (population - lag(population)) / lag(population),
+    permits = (permits - lag(permits)) / lag(permits),
+    sources = (sources - lag(sources)) / lag(sources),
+    establishments = (establishments - lag(establishments)) / lag(establishments)
+  ) |> 
+  filter(year > 1997)
 
 saveRDS(masterdata_subset, file = "~/562-Project/clean-data/masterdata_subset.rds")

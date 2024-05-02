@@ -52,25 +52,25 @@ radium_summed = radium2 |>
 # append Radium 226+228 data
 radium3 = rbind(radium_226_228, radium_summed)
 
-# county-year radium averages
+# set each county-year observation to be highest result of that county's samples in that year
 radium4 = radium3 |> 
   group_by(county, year) |> 
-  summarize(ra_average = mean(measurement))
+  summarize(ra_max = max(measurement))
 
 #------------------------------------------------------------------------------#
 # impute missing years to be zero ----
 
 # grid of all year-county combinations
 grid = expand_grid(
-  county = unique(radium4$county),
-  year = unique(radium4$year)
+  county = unique(radium3$county),
+  year = unique(radium3$year)
 )
 
 radium = grid |> 
   left_join(radium4, by = c("county", "year")) |> 
   # replace NAs with zero
   mutate(
-    ra_average = ifelse(is.na(ra_average), 0, ra_average)
+    ra_max = ifelse(is.na(ra_max), 0, ra_max)
   )
 
 #------------------------------------------------------------------------------#
